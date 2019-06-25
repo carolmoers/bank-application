@@ -16,18 +16,17 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TransactionServiceIntegrationTest {
-    private static final boolean IS_SUCCESSFUL = true;
-    Account accountToDebitBalance;
-    Account accountToIncreaseBalance;
+    private Account accountToDebitBalance;
+    private Account accountToIncreaseBalance;
 
     @Autowired
-    TransactionService transactionService;
+    private TransactionService transactionService;
 
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
-    TransactionRepository transactionRepository;
+    private TransactionRepository transactionRepository;
 
     @Before
     public void setUp() {
@@ -44,21 +43,16 @@ public class TransactionServiceIntegrationTest {
     }
 
     @Test
-    public void updatesAccountBalanceCorrectly() {
-        boolean transactionResult =
-                transactionService.transfers(accountToDebitBalance, accountToIncreaseBalance, Double.valueOf(50));
+    public void shouldUpdatesAccountBalanceCorrectly() {
+        transactionService.transfers(accountToDebitBalance, accountToIncreaseBalance, Double.valueOf(50));
 
-        assertEquals(transactionResult, IS_SUCCESSFUL);
         assertEquals(Double.valueOf(100), accountToDebitBalance.getBalance());
         assertEquals(Double.valueOf(100), accountToIncreaseBalance.getBalance());
     }
 
     @Test
-    public void createTransactionsCorrectly() {
-        boolean transactionResult =
-                transactionService.transfers(accountToDebitBalance, accountToIncreaseBalance, Double.valueOf(50));
-
-        assertEquals(transactionResult, IS_SUCCESSFUL);
+    public void shouldCreateTransactionsCorrectly() {
+        transactionService.transfers(accountToDebitBalance, accountToIncreaseBalance, Double.valueOf(50));
 
         assertEquals(2, transactionRepository.findAll().size());
     }

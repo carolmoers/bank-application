@@ -10,7 +10,7 @@ import javax.persistence.Column;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private Long id;
 
     @Column(unique=true, nullable=false)
@@ -25,19 +25,16 @@ public class Account {
         this.balance = balance;
     }
 
-    public boolean debit(Double ammount) {
-        if(ammount <= this.balance) {
-            this.balance = this.balance - ammount;
-            return true;
+    public void debit(Double amount) {
+        if(amount <= this.balance) {
+            this.balance = this.balance - amount;
+        } else {
+          throw new IllegalArgumentException("Not enough money to debit");
         }
-
-        return false;
     }
 
-    public boolean deposit(Double ammount) {
-        this.balance = this.balance + ammount;
-
-        return true;
+    public void deposit(Double amount) {
+        this.balance = this.balance + amount;
     }
 
     public Double getBalance() {
