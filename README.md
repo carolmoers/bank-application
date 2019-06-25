@@ -22,6 +22,12 @@ $ ./gradlew clean build
 $ ./gradlew bootRun
 ```
 
+## Running integration tests
+
+```
+$ ./gradlew integrationTest
+```
+
 ### Database
 
 The `bank application` uses the database [H2](https://www.h2database.com/html/main.html) with the simple purpose of test.
