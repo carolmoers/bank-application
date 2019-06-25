@@ -5,6 +5,8 @@ import com.bankapplication.model.Transaction;
 import com.bankapplication.repository.AccountRepository;
 import com.bankapplication.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import static com.bankapplication.model.TransactionType.CREDIT_TRANSFER;
@@ -22,20 +24,24 @@ public class TransactionService {
     }
 
     public boolean transfers(Account accountToDebit, Account accountToDeposit, Double amount) {
-        if(accountToDebit.debit(amount)) {
-            accountRepository.save(accountToDebit);
-            Transaction transactionDebit = new Transaction(DEBIT_TRANSFER, amount, accountToDebit);
-            transactionRepository.save(transactionDebit);
+        try {
+            if(accountToDebit.debit(amount)) {
+                accountRepository.save(accountToDebit);
+                Transaction transactionDebit = new Transaction(DEBIT_TRANSFER, amount, accountToDebit);
+                transactionRepository.save(transactionDebit);
 
 
-            boolean transactionStatus = accountToDeposit.deposit(amount);
-            accountRepository.save(accountToDeposit);
-            Transaction transactionCredit = new Transaction(CREDIT_TRANSFER, amount, accountToDeposit);
-            transactionRepository.save(transactionCredit);
+                boolean transactionStatus = accountToDeposit.deposit(amount);
+                accountRepository.save(accountToDeposit);
+                Transaction transactionCredit = new Transaction(CREDIT_TRANSFER, amount, accountToDeposit);
+                transactionRepository.save(transactionCredit);
 
-            return transactionStatus;
+                return transactionStatus;
+            }
+
+            return false;
+        } catch (Exception e) {
+            throw new IllegalStateException("Some error happened during the transfer", e);
         }
-
-        return false;
     }
 }

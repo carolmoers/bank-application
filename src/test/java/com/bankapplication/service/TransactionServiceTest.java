@@ -8,12 +8,14 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -59,5 +61,17 @@ public class TransactionServiceTest {
         assertEquals(Double.valueOf(50), accountToIncreaseBalance.getBalance());
         verify(accountRepository, never()).save(any());
         verify(transactionRepository, never()).save(any());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrownExceptionIfAnyErrorHappenWhenTransfering() {
+        Account accountToDebitBalance = new Account(890, Double.valueOf(50));
+        Account accountToIncreaseBalance = new Account(456, Double.valueOf(50));
+
+        when(transactionRepository.save(any()))
+                .thenThrow(DataIntegrityViolationException.class);
+
+        transactionService.transfers(accountToDebitBalance, accountToIncreaseBalance, Double.valueOf(20));
+
     }
 }
