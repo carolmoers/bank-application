@@ -1,15 +1,39 @@
 package com.bankapplication.service;
 
 import com.bankapplication.model.Account;
+import com.bankapplication.model.Transaction;
+import com.bankapplication.repository.AccountRepository;
+import com.bankapplication.repository.TransactionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static com.bankapplication.model.TransactionType.CREDIT_TRANSFER;
+import static com.bankapplication.model.TransactionType.DEBIT_TRANSFER;
 
 @Service
 public class TransactionService {
+    private AccountRepository accountRepository;
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    public TransactionService(AccountRepository accountRepository, TransactionRepository transactionRepository) {
+        this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
+    }
 
     public boolean transfers(Account accountToDebit, Account accountToDeposit, Double amount) {
         if(accountToDebit.debit(amount)) {
-            return accountToDeposit.deposit(amount);
+            accountRepository.save(accountToDebit);
+            Transaction transactionDebit = new Transaction(DEBIT_TRANSFER, amount, accountToDebit);
+            transactionRepository.save(transactionDebit);
 
+
+            boolean transactionStatus = accountToDeposit.deposit(amount);
+            accountRepository.save(accountToDeposit);
+            Transaction transactionCredit = new Transaction(CREDIT_TRANSFER, amount, accountToDeposit);
+            transactionRepository.save(transactionCredit);
+
+            return transactionStatus;
         }
 
         return false;

@@ -1,4 +1,5 @@
 package com.bankapplication.model;
 
-public class TransactionType {
+public enum TransactionType {
+    DEBIT_TRANSFER, CREDIT_TRANSFER
 }
