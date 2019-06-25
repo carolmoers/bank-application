@@ -22,3 +22,10 @@ $ ./gradlew clean build
 $ ./gradlew bootRun
 ```
 
+### Database
+
+The `bank application` uses the database [H2](https://www.h2database.com/html/main.html) with the simple purpose of test.
+By default, the database username is `bankapplication` and the password is `password` (don't do this at home)
+
+To access the database when the application is running, you can access `http://localhost:8080/h2-console`
+
