@@ -3,6 +3,7 @@ package com.bankapplication.controller;
 import com.bankapplication.model.Account;
 import com.bankapplication.service.AccountService;
 import com.bankapplication.service.TransactionService;
+import javassist.NotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -29,7 +30,7 @@ public class TransactionControllerTest {
     private TransactionController transactionController;
 
     @Test
-    public void shouldReturnSuccessWhenTransferIsSuccessful() {
+    public void shouldReturnSuccessWhenTransferIsSuccessful() throws NotFoundException {
         Account accountToDebit = new Account(ACCOUNT_TO_DEBIT_NUMBER, Double.valueOf(150));
         Account accountToDeposit = new Account(ACCOUNT_TO_DEPOSIT_NUMBER, Double.valueOf(50));
 

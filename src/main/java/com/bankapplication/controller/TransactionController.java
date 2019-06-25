@@ -3,6 +3,7 @@ package com.bankapplication.controller;
 import com.bankapplication.model.Account;
 import com.bankapplication.service.AccountService;
 import com.bankapplication.service.TransactionService;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestController
@@ -27,11 +29,14 @@ public class TransactionController {
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<String> transfer(@Valid @RequestBody TransferInformation transferInformation) {
-
-
+    public ResponseEntity<String> transfer(@Valid @RequestBody TransferInformation transferInformation)
+            throws NotFoundException {
         Account accountToDebit = accountService.findByNumber(transferInformation.getAccountToDebitNumber());
         Account accountToDeposit = accountService.findByNumber(transferInformation.getAccountToDepositNumber());
+
+        if(isNull(accountToDebit) || isNull(accountToDeposit)) {
+            throw new NotFoundException("Some of the accounts does not exist");
+        }
 
         transactionService.transfers(accountToDebit, accountToDeposit, transferInformation.getAmount());
 
@@ -52,6 +57,14 @@ public class TransactionController {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalStateError(IllegalArgumentException e){
+
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(format("Transfer failed: %s", e.getMessage()));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundError(NotFoundException e){
 
         return ResponseEntity
                 .status(BAD_REQUEST)

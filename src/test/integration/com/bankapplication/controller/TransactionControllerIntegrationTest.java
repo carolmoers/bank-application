@@ -63,6 +63,7 @@ public class TransactionControllerIntegrationTest {
 
         ObjectMapper mapper = new ObjectMapper();
         String jsonString = mapper.writeValueAsString(transferInformation);
+
         mockMvc.perform(post(TRANSFER_URL)
                 .content(jsonString)
                 .contentType(APPLICATION_JSON))
@@ -99,5 +100,20 @@ public class TransactionControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$")
                         .value("Transfer failed: Some error happened during the transfer"));
+    }
+
+    @Test
+    public void shouldHandleErrorWhenAccountNotFound() throws Exception {
+        TransferInformation transferInformation =
+                new TransferInformation(10, ACCOUNT_TO_DEPOSIT_NUMBER, Double.valueOf(200));
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = mapper.writeValueAsString(transferInformation);
+        mockMvc.perform(post(TRANSFER_URL)
+                .content(jsonString)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$")
+                        .value("Transfer failed: Some of the accounts does not exist"));
     }
 }

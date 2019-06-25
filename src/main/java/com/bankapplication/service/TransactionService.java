@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import static com.bankapplication.model.TransactionType.CREDIT_TRANSFER;
 import static com.bankapplication.model.TransactionType.DEBIT_TRANSFER;
+import static java.util.Objects.isNull;
 
 @Service
 public class TransactionService {
@@ -23,11 +24,14 @@ public class TransactionService {
 
     public void transfers(Account accountToDebit, Account accountToDeposit, Double amount) {
         try {
+            if(isNull(accountToDebit) || isNull(accountToDeposit)) {
+                throw new IllegalArgumentException("Some of the accounts does not exist");
+            }
+
             accountToDebit.debit(amount);
             accountRepository.save(accountToDebit);
             Transaction transactionDebit = new Transaction(DEBIT_TRANSFER, amount, accountToDebit);
             transactionRepository.save(transactionDebit);
-
 
             accountToDeposit.deposit(amount);
             accountRepository.save(accountToDeposit);
